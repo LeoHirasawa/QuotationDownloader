@@ -1,0 +1,80 @@
+181712
+[1505117197]
+formatted stock id range:
+181700--------------181711
+Total number of stock data is: 
+38
+Invalid number of stock data is: 
+0
+Invalid rate: 
+0.00%
+Source error number of stock data is: 
+7
+Source error rate: 
+18.42%
+Extract error of stock data is: 
+0
+Extract error rate: 
+0.00%
+
+
+
+[1505117248]
+formatted stock id range:
+181711--------------181711
+Total number of stock data is: 
+38
+Invalid number of stock data is: 
+0
+Invalid rate: 
+0.00%
+Source error number of stock data is: 
+7
+Source error rate: 
+18.42%
+Extract error of stock data is: 
+0
+Extract error rate: 
+0.00%
+
+
+
+[1505117304]
+formatted stock id range:
+181711--------------181712
+Total number of stock data is: 
+39
+Invalid number of stock data is: 
+0
+Invalid rate: 
+0.00%
+Source error number of stock data is: 
+7
+Source error rate: 
+17.95%
+Extract error of stock data is: 
+1
+Extract error rate: 
+2.56%
+
+
+
+[1505118012]
+formatted stock id range:
+181712--------------181712
+Total number of stock data is: 
+39
+Invalid number of stock data is: 
+0
+Invalid rate: 
+0.00%
+Source error number of stock data is: 
+7
+Source error rate: 
+17.95%
+Extract error of stock data is: 
+1
+Extract error rate: 
+2.56%
+
+
