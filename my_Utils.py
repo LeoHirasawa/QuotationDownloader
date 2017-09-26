@@ -120,9 +120,9 @@ def shutDownTimeDetector(nowDate):
     T_list = DandT_list[1].split(':')
     hour = int(T_list[0])
     minute = int(T_list[1])
-    if hour == 11 and minute > 35:
+    if hour == 11 and minute > 40:
         shutDownFlag = 1
-    if hour == 15 and minute > 5:
+    if hour == 15 and minute > 10:
         shutDownFlag = 1
     if hour > 15 or hour < 8:
         shutDownFlag = 1
