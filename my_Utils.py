@@ -46,8 +46,9 @@ def getBasicStockData():
 def stockMarketFormatter(type, **kwargs):
     # type:
     # use code(only number) to judge market = 1
-    # add market to code = 2
-    # separate market and code from code = 3
+    # add market to code = 2 (sina format)
+    # add market to code = 3 (wangyi format)
+    # separate market and code from code = 4
 
     code = None
     market = None
@@ -93,6 +94,23 @@ def stockMarketFormatter(type, **kwargs):
             pass
         return formattedCode
     elif type == 3:
+        formattedCode = None
+        if code != None and market != None:
+            if market == 'SH':
+                formattedCode = '0' + str(code)
+            elif market == 'SZ':
+                formattedCode = '1' + str(code)
+            elif market == 'SH/SZ':
+                # more task on it
+                formattedCode = '2' + str(code)
+            elif market == 'NA':
+                formattedCode = '2' + str(code)
+            else:
+                pass
+        else:
+            pass
+        return formattedCode
+    elif type == 4:
         pass
     else:
         pass
@@ -130,161 +148,59 @@ def shutDownTimeDetector(nowDate):
 
 
 
-
-
-
-
-
-
-
-
-
-# parse the data got from interfaces(json or other format)
-def parseDataFromURL(DataType,rawData):
-    # DataType:
-    # sina Real-time Data(sh/sz),pick up sh/sz-stock name = 1    ------------------------------------    rawData : decodedUrlData
-    # sina Real-time Data(hk),pick up hk-stock name = 2    ------------------------------------------    rawData : decodedUrlData
-    # sina Real-time Data(sh/sz,hk),pick up stock code,name,real-timeData = 3    --------------------    rawData : decodedUrlData
-    if DataType == 1:
-        # print 'SH/SZ'
-        tempData = rawData.split('="')
-        stockName = tempData[1].split(',')[0]
-        return stockName
-    if DataType == 2:
-        # print 'HK'
-        tempData = rawData.split('="')
-        stockName = tempData[1].split(',')[1]
-        return stockName
-    if DataType == 3:
-        tempData = rawData.split('="')
-        code = tempData[0].split('_')[-1]
-        name = tempData[1].split(',')[0]
-        str1 = tempData[1].split(',')[1]
-        parsedData = []
-        parsedData.append(code)
-        parsedData.append(name)
-        parsedData.append(str1)
-        return parsedData
-    else:
-        return None
-
-
-
-# parse the report dates to yahoo finance format
-def parseReportDateList(reportDateList):
-    i = 0
-    reportStartDateList = []
-    for date in reportDateList:
-        i = i + 1
-        report_start_date_timestamp = my_Time.transDateToTimestamp(my_Time.parseDate(date))
-        reportStartDateList.append(report_start_date_timestamp)
-    return reportStartDateList
-
-
-
 # detect the loss csv,record and delete them
-def CsvFileLossDetector(stockCode_earliestDate_pairs, optionalPair, interval, detectType):
-    # interval:
-    # daily = 1
-    # weekly = 2
-    # monthly = 3
-
-    # detectType
-    # zj = 1
-    # ml = 2
-
+def CsvFileLossDetector(formatted_codeList, days):
     CsvFileLossList = []
-    CsvFileLossPair = {}
-    print "Detecting the loss CSVs..."
-    print "Deleting the loss CSVs..."
-    if detectType == 1:
-        for code in stockCode_earliestDate_pairs:
-            formattedCode = optionalPair[code]
+    print "Detecting and deleting the loss CSVs..."
+    for code in formatted_codeList:
+        if str(code[0]) != '2':
             rowCount = 0
-            csvName = "/home/ntlab607/Downloads/csvFrom_yahoo_zj/" + str(formattedCode) + ".csv"
+            csvName = "./csvs/" + str(code)[1:] + ".csv"
 
-            if interval == 1:
-                days = (my_Time.getNowTimestamp() - stockCode_earliestDate_pairs[code]) / 86400 - 1
-                weekNum = days / 7
-                hiddenWeek = days % 7
-                if hiddenWeek > 0:
-                    days = days - (weekNum + 1) * 2
-                else:
-                    days = days - weekNum * 2
-                threshold = days
-            elif interval == 2:
-                days = (my_Time.getNowTimestamp() - stockCode_earliestDate_pairs[code]) / 86400 - 1
-                threshold = days / 7
-            elif interval == 3:
-                year1, month1 = time.gmtime(my_Time.getNowTimestamp())[0], time.gmtime(my_Time.getNowTimestamp())[1]
-                year2, month2 = time.gmtime(stockCode_earliestDate_pairs[code])[0], time.gmtime(stockCode_earliestDate_pairs[code])[1]
-                threshold = (year1 - year2) * 12 + (month1 - month2) + 1
+            weekNum = days / 7
+            hiddenDays = days % 7
+            if hiddenDays > 2:
+                threshold = (hiddenDays - 2) + weekNum * 5 + 1
             else:
-                threshold = 2
+                threshold = weekNum * 5 + 1
+
+            # all stock stop about 30 days every year
+            # and some stock has been delisted(or maybe the stock just be listed lately),so line will be very few
+            threshold = threshold - days / 10 - days / 5
+
             try:
                 with open(csvName) as csvFile:
                     f_csv = csv.reader(csvFile)
                     for row in f_csv:
                         rowCount = rowCount + 1
-                    if rowCount <= threshold:
+                    if rowCount < threshold:
                         # the csv is invalid, set it into csv_download_fail table in database
-                        CsvFileLossList.append(code)
+                        CsvFileLossList.append(code[1:])
                         # then delete it
+                        print 'csv '+ csvName +' data is wrong ,deleted'
                         os.remove(csvName)
                     else:
                         continue
             except Exception, e:
                 print e
                 continue
-        return CsvFileLossList
-    if detectType == 2:
-        for code in stockCode_earliestDate_pairs:
-            CsvFileLossList = []
-            try:
-                formatted_codeList = optionalPair[code]
-            except Exception, e:
-                print e
-                continue
-            for formatted_code in formatted_codeList:
-                rowCount = 0
-                csvName = "/home/ntlab607/Downloads/csvFrom_yahoo_ml/" + formatted_code + ".csv"
-                if interval == 1:
-                    days = (my_Time.getNowTimestamp() - stockCode_earliestDate_pairs[code]) / 86400 - 1
-                    weekNum = days / 7
-                    hiddenWeek = days % 7
-                    if hiddenWeek > 0:
-                        days = days - (weekNum + 1) * 2
-                    else:
-                        days = days - weekNum * 2
-                    threshold = days
-                elif interval == 2:
-                    days = (my_Time.getNowTimestamp() - stockCode_earliestDate_pairs[code]) / 86400 - 1
-                    threshold = days / 7
-                elif interval == 3:
-                    year1, month1 = time.gmtime(my_Time.getNowTimestamp())[0], time.gmtime(my_Time.getNowTimestamp())[1]
-                    year2, month2 = time.gmtime(stockCode_earliestDate_pairs[code])[0], \
-                                    time.gmtime(stockCode_earliestDate_pairs[code])[1]
-                    threshold = (year1 - year2) * 12 + (month1 - month2) + 1
-                else:
-                    threshold = 2
+        else:
+            CsvFileLossList.append(code[1:])
+    return CsvFileLossList
 
-                try:
-                    with open(csvName) as csvFile:
-                        f_csv = csv.reader(csvFile)
-                        for row in f_csv:
-                            rowCount = rowCount + 1
-                        if rowCount <= threshold:
-                            # the csv is invalid, set it into csv_download_fail table in database
-                            CsvFileLossList.append(formatted_code)
-                            # then delete it
-                            os.remove(csvName)
-                        else:
-                            continue
-                except Exception, e:
-                    continue
-            CsvFileLossPair[code] = CsvFileLossList
-        return CsvFileLossPair
-    else:
-        return None
+
+
+def CsvFileNotDownloadedDetector(formatted_codeList):
+    notDownloaded_codeList = []
+    for code in formatted_codeList:
+        if str(code)[0] != '2':
+            csvName = "./csvs/" + str(code)[1:] + ".csv"
+            if os.path.exists(csvName):
+                continue
+            else:
+                notDownloaded_codeList.append(code)
+    return notDownloaded_codeList
+
+
 
 

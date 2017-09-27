@@ -1,2 +1,4 @@
 .idea/
+csvs/
+csvs_backup/
 *.pyc

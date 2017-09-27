@@ -26,4 +26,25 @@ import dataDownloader
 if __name__ == "__main__":
     reload(sys)
     sys.setdefaultencoding('utf-8')
-    dataDownloader.updateStockMinQuotation()
+
+    # step 1: connect to database
+    MysqlCursor , MysqlConn = DAO.MysqlConnector(1)
+
+    # step 2:create the basic data database(optional)
+    # setNum = dataDownloader.createBasicDatabase(MysqlCursor, MysqlConn)
+
+    # step 3: update Stock Min Quotation
+    # shutDownFlag = dataDownloader.updateStockMinQuotation(MysqlCursor , MysqlConn)
+
+    # step 4: update Stock Historical Quotation csv
+    shutDownFlag = dataDownloader.updateStockHistoricalQuotation(MysqlCursor, MysqlConn)
+
+    # step 5: shut down this program
+    if shutDownFlag == 1:
+        print '---------------------Now the stock market is closed, this program will shut down for a moment------------------------'
+        DAO.MysqlCloser(MysqlCursor, MysqlConn)
+        sys.exit(0)
+    if shutDownFlag == 2:
+        print '---------------------stock historical quotation CSVs have been downloaded------------------------'
+        DAO.MysqlCloser(MysqlCursor, MysqlConn)
+        sys.exit(0)

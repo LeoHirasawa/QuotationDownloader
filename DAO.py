@@ -68,6 +68,7 @@ def setStockBasicData(MysqlCursor , MysqlConn, stockList):
                   "code VARCHAR(255) NULL," \
                   "name VARCHAR(255) NULL," \
                   "market VARCHAR(255) NULL," \
+                  "csv VARCHAR(255) NULL," \
                   "PRIMARY KEY (id))"
     try:
         n = MysqlCursor.execute(sql_0)
@@ -195,6 +196,38 @@ def setStockMinData(MysqlCursor, MysqlConn, stockMinDataPair):
     except Exception, e:
         print e
     return setNum
+
+
+
+def setCsvTag(MysqlCursor, MysqlConn, CsvFileLossList):
+    print 'update csv situation to database...'
+
+    sql_0 = "UPDATE stock_analyze.stock_basic_info SET csv = '%s'" % ('valid')
+    try:
+        n = MysqlCursor.execute(sql_0)
+    except Exception, e:
+        print e
+    MysqlConn.commit()
+
+    setNum = 0
+    for code in CsvFileLossList:
+        sql = "UPDATE stock_analyze.stock_basic_info SET csv = '%s' WHERE code = '%s'" % ('invalid', code)
+        try:
+            n = MysqlCursor.execute(sql)
+            if n > 0:
+                setNum = setNum + 1
+        except Exception, e:
+            print e
+            continue
+    MysqlConn.commit()
+
+    return setNum
+
+
+
+
+
+
 
 
 

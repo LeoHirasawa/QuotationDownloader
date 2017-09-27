@@ -83,196 +83,74 @@ def getMinDataFromURL(type, **kwargs):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Download historical data csv from yahoo
-def DownloadCsv(csvType, stockCode_earliestDate_pairs, optionalPair, interval):
-    # csvType:
+def DownloadCsv(type, **kwargs):
+    # type:
     # Download historical data csv(sh/sz) from wangyi = 1    ---------------------------- Date format:20170815
-    # Download historical data csv(sh/sz/hk/us) from yahoo finance = 2    ---------------------------- Date format:1503046806(timestamp)
 
-    # interval:
-    # daily = 1
-    # weekly = 2
-    # monthly = 3
-
-    # endDate is optional,you can give a None for default
+    formatted_codeList = None
+    startDate = None
+    endDate = None
+    for key in kwargs:
+        if key == 'formatted_codeList':
+            formatted_codeList = kwargs[key]
+        if key == 'startDate':
+            startDate = kwargs[key]
+        if key == 'endDate':
+            endDate = kwargs[key]
 
     print "Starting download CSVs..."
-    global csv
-    if csvType == 1:
-        DownloadedNum = 0
-        # WangyiCsvUrlBase = "http://quotes.money.163.com/service/chddata.html?code="
-        # for code in formatted_codeList:
-        #     addCode = WangyiCsvUrlBase + '0' + code[2:]
-        #     addDate = addCode + "&start=" + "&end=" + endDate
-        #     WangyiCsvUrl = addDate + "&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP"
-        #     try:
-        #         csv = urllib2.urlopen(WangyiCsvUrl).read()
-        #         csvName = "/home/ntlab607/Downloads/csvFrom_Wangyi/" + code + ".csv"
-        #         with open(csvName, "wb") as csvFile:
-        #             csvFile.write(csv)
-        #         csvFile.close()
-        #         print "one CSV saved"
-        #         DownloadedNum = DownloadedNum + 1
-        #         time.sleep(10)
-        #     except Exception, e:
-        #         print e
-        return DownloadedNum
-    elif csvType == 2:
-        DownloadedNum = 0
-        FailNum = 0
-        failCodeList = []
-        yahooUrlBase_part1 = "https://query1.finance.yahoo.com/v7/finance/download/"
-        yahooUrlBase_part2 = "&events=history&crumb="
-        crumb = loadToken()['crumb']
-
-        req_header = {
-            'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36',
-            'Accept':'*/*',
-            'Accept-Language':'en-US,en;q=0.8',
-            # 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-            'Accept-Encoding':'gzip, deflate, br',
-            # 'Host': 'streamerapi.finance.yahoo.com',
-            # 'Connection':'close',
-            # 'Origin':'https://finance.yahoo.com',
-            # 'Referer':'https://finance.yahoo.com/__streamer-worker-0.3.62.js'  # if still fail ,add host and other key-values
-        }
-
-        if interval == 1:
-            gap = "1d"
-        elif interval == 2:
-            gap = "1wk"
-        else:
-            gap = "1mo"
-
-        for code in stockCode_earliestDate_pairs:
-            timestamp = stockCode_earliestDate_pairs[code]
-            formatted_code = optionalPair[code]
-            csvName = "/home/ntlab607/Downloads/csvFrom_yahoo_zj/" + formatted_code + ".csv"
-            if os.path.exists(csvName):
-                print "CSV file " + csvName + " exist...continue"
-                DownloadedNum = DownloadedNum + 1
-                continue
-            else:
-                if timestamp != None:
-                    startDate = str(timestamp)
-                    endDate = str(my_Time.getNowTimestamp())
-                    yahooUrl = yahooUrlBase_part1 + formatted_code + "?period1=" + startDate + "&period2=" + endDate + "&interval=" + gap + yahooUrlBase_part2 + crumb
-                    print yahooUrl
-                    time.sleep(2)
-                    try:
-                        data = requests.get(yahooUrl, cookies = {'B': loadToken()['cookie']}, timeout = 5)
-                    except Exception, e:
-                        print e
-                        FailNum = FailNum + 1
-                        failCodeList.append(code)
-                        continue
-                    csvContent = data.text
-                    with open(csvName, "wb") as csvFile:
-                        csvFile.write(csvContent)
-                    csvFile.close()
-                    print "one yahoo_CSV saved"
-                    DownloadedNum = DownloadedNum + 1
-                else:
-                    FailNum = FailNum + 1
-                    continue
-        return DownloadedNum, FailNum, failCodeList
-    elif csvType == 3:
-        DownloadedNum = 0
-        FailNum = 0
-        oneStockSeveralTryFlag = 0
-        failCodePair = {}
-        yahooUrlBase_part1 = "https://query1.finance.yahoo.com/v7/finance/download/"
-        yahooUrlBase_part2 = "&events=history&crumb="
-        crumb = loadToken()['crumb']
-
-        req_header = {
-            'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36',
-            'Accept':'*/*',
-            'Accept-Language':'en-US,en;q=0.8',
-            # 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-            'Accept-Encoding':'gzip, deflate, br',
-            # 'Host': 'streamerapi.finance.yahoo.com',
-            # 'Connection':'close',
-            # 'Origin':'https://finance.yahoo.com',
-            # 'Referer':'https://finance.yahoo.com/__streamer-worker-0.3.62.js'  # if still fail ,add host and other key-values
-        }
-
-        if interval == 1:
-            gap = "1d"
-        elif interval == 2:
-            gap = "1wk"
-        else:
-            gap = "1mo"
-
-        for code in stockCode_earliestDate_pairs:
-            failCodeList = []
-            errorFlag = 0
-            try:
-                # when iter,the code will not exist in the optionalPair
-                formatted_codeList = optionalPair[code]
-            except Exception, e:
-                print e
-                continue
-            timestamp = stockCode_earliestDate_pairs[code]
-            maxNum = len(formatted_codeList)
-            validFileNum = 0
-            for formatted_code in formatted_codeList:
-                csvName = "/home/ntlab607/Downloads/csvFrom_yahoo_ml/" + formatted_code + ".csv"
-                if os.path.exists(csvName):
-                    # have issues here..if all files exist, how to add DownloadedNum?
-                    print "CSV file " + csvName + " exist...continue"
-                    validFileNum = validFileNum + 1
-                    if validFileNum >= maxNum:
-                        DownloadedNum = DownloadedNum + 1
-                    continue
-                else:
-                    if timestamp != None:
-                        startDate = str(timestamp)
-                        endDate = str(my_Time.getNowTimestamp())
-                        yahooUrl = yahooUrlBase_part1 + formatted_code + "?period1=" + startDate + "&period2=" + endDate + "&interval=" + gap + yahooUrlBase_part2 + crumb
-                        print yahooUrl
-                        time.sleep(2)
+    DownloadedNum = 0
+    if type == 1:
+        if formatted_codeList != None and startDate != None and endDate != None:
+            WangyiCsvUrlBase = "http://quotes.money.163.com/service/chddata.html?code="
+            req_header = {
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36',
+            }
+            for code in formatted_codeList:
+                if code != None:
+                    addCode = WangyiCsvUrlBase + str(code)
+                    addDate = addCode + "&start=" + startDate + "&end=" + endDate
+                    WangyiCsvUrl = addDate + "&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP"
+                    csvName = "./csvs/" + str(code)[1:] + ".csv"
+                    urlData = None
+                    csvData = None
+                    tryTime = 1
+                    while tryTime < 5 and tryTime > 0:
+                        print 'Grabbing stock historical quotation csv from wangyi...'
                         try:
-                            data = requests.get(yahooUrl, cookies = {'B': loadToken()['cookie']}, timeout = 5)
+                            urlData = requests.get(WangyiCsvUrl, headers = req_header, timeout = 5)
+                            tryTime = -1
                         except Exception, e:
                             print e
-                            # if fail once, it will be added to failList
-                            FailNum = FailNum + 1
-                            # bloombergCode
-                            failCodeList.append(code)
-                            break
-                        if errorFlag == 0:
-                            csvContent = data.text
-                            with open(csvName, "wb") as csvFile:
-                                csvFile.write(csvContent)
-                            csvFile.close()
-                            print "one yahoo_CSV saved"
+                            tryTime = tryTime + 1
+                    if tryTime < 0:
+                        urlData.encoding = 'gbk'
+                        csvData = urlData.text
+                        global_list.GLOBAL_REQUEST_ERROR_COUNT = 0
                     else:
-                        FailNum = FailNum + 1
-                        failCodeList.append(code)
-                        break
-                validFileNum = validFileNum + 1
-                if validFileNum >= maxNum:
-                    DownloadedNum = DownloadedNum + 1
+                        csvData = None
+                        global_list.GLOBAL_REQUEST_ERROR_COUNT = global_list.GLOBAL_REQUEST_ERROR_COUNT + 1
+                        my_Utils.crashDetector()
 
-            if len(failCodeList) > 0:
-                failCodePair[code] = failCodeList
-        return DownloadedNum, FailNum, failCodePair
+                    if csvData != None:
+                        with open(csvName, "wb") as csvFile:
+                            csvFile.write(csvData)
+                        csvFile.close()
+                        print "---one CSV saved--- csv : " + str(csvName)
+                        DownloadedNum = DownloadedNum + 1
+                        time.sleep(10)
+        return DownloadedNum
     else:
         return None
+
+
+
+
+
+
+
+
+
 
 
 
