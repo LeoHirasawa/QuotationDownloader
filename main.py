@@ -31,7 +31,9 @@ if __name__ == "__main__":
     MysqlCursor , MysqlConn = DAO.MysqlConnector(1)
 
     # step 2:create the basic data database(optional)
-    # setNum = dataDownloader.createBasicDatabase(MysqlCursor, MysqlConn)
+    # A stock = 1
+    # HK stock = 2
+    setNum = dataDownloader.createBasicDatabase(MysqlCursor, MysqlConn, 2)
 
     # step 3: update Stock Min Quotation
     # shutDownFlag = dataDownloader.updateStockMinQuotation(MysqlCursor , MysqlConn)

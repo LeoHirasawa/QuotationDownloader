@@ -19,9 +19,9 @@ import DAO
 
 
 
-def createBasicDatabase(MysqlCursor, MysqlConn):
+def createBasicDatabase(MysqlCursor, MysqlConn, type):
     # load the stock list html, and grab all the stock data to database
-    stockList = my_Utils.getBasicStockData()
+    stockList = my_Utils.getBasicStockData(type)
     setNum = DAO.setStockBasicData(MysqlCursor, MysqlConn, stockList)
     return setNum
 

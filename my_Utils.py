@@ -22,21 +22,37 @@ def isNum(myChar):
 
 
 
-def getBasicStockData():
+def getBasicStockData(type):
     # get all stock basic data from html file
-    if os.path.exists('./files/name_code_list_ch.html') and os.path.getsize('./files/name_code_list_ch.html'):
-        print 'grab stock basic info from local data...'
-        soup = BeautifulSoup(open('./files/name_code_list_ch.html'), 'html.parser')
-        metaHtml = soup.find_all('a', target = '_blank', href = re.compile('http://quote.eastmoney.com/[s(h|z)]'))
-        stockList = []
-        for data in metaHtml:
-            if '<strong>' not in str(data.contents[0]):
-                rawStr = data.contents[0]
-                tempList = str(rawStr).split('(')
-                stockName = tempList[0]
-                stockCode = tempList[1].split(')')[0]
-                stockMarket = stockMarketFormatter(1, code = stockCode)
-                stockList.append((stockCode, stockName, stockMarket))
+    stockList = []
+    if type == 1:
+        if os.path.exists('./files/name_code_list_ch.html') and os.path.getsize('./files/name_code_list_ch.html'):
+            print 'grab stock basic info from local data...'
+            soup = BeautifulSoup(open('./files/name_code_list_ch.html'), 'html.parser')
+            metaHtml = soup.find_all('a', target = '_blank', href = re.compile('http://quote.eastmoney.com/[s(h|z)]'))
+            stockList = []
+            for data in metaHtml:
+                if '<strong>' not in str(data.contents[0]):
+                    rawStr = data.contents[0]
+                    tempList = str(rawStr).split('(')
+                    stockName = tempList[0]
+                    stockCode = tempList[1].split(')')[0]
+                    stockMarket = stockMarketFormatter(1, code = stockCode)
+                    stockList.append((stockCode, stockName, stockMarket))
+    elif type == 2:
+        if os.path.exists('./files/name_code_list_hk.html') and os.path.getsize('./files/name_code_list_hk.html'):
+            print 'grab stock basic info from local data...'
+            soup = BeautifulSoup(open('./files/name_code_list_hk.html'), 'html.parser')
+            metaHtml = soup.find_all('a', target = '_blank', href = re.compile('http://quote.eastmoney.com/hk'))
+            stockList = []
+            for data in metaHtml:
+                if '<strong>' not in str(data.contents[0]):
+                    rawStr = data.contents[0]
+                    tempList = str(rawStr).split(')')
+                    stockName = tempList[1]
+                    stockCode = tempList[0].split('(')[1]
+                    stockMarket = 'HK'
+                    stockList.append((stockCode, stockName, stockMarket))
     else:
         stockList = None
     return stockList

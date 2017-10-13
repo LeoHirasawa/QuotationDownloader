@@ -57,24 +57,24 @@ def tableDropper(MysqlCursor , MysqlConn, stockList):
 
 # set stock basic data to database
 def setStockBasicData(MysqlCursor , MysqlConn, stockList):
-    sql_0 = "DROP TABLE IF EXISTS stock_analyze.stock_basic_info"
-    try:
-        n = MysqlCursor.execute(sql_0)
-        MysqlConn.commit()
-    except Exception, e:
-        print e
-    sql_0 = "CREATE TABLE stock_analyze.stock_basic_info" \
-                  "(id INT NOT NULL AUTO_INCREMENT," \
-                  "code VARCHAR(255) NULL," \
-                  "name VARCHAR(255) NULL," \
-                  "market VARCHAR(255) NULL," \
-                  "csv VARCHAR(255) NULL," \
-                  "PRIMARY KEY (id))"
-    try:
-        n = MysqlCursor.execute(sql_0)
-        MysqlConn.commit()
-    except Exception, e:
-        print e
+    # sql_0 = "DROP TABLE IF EXISTS stock_analyze.stock_basic_info"
+    # try:
+    #     n = MysqlCursor.execute(sql_0)
+    #     MysqlConn.commit()
+    # except Exception, e:
+    #     print e
+    # sql_0 = "CREATE TABLE stock_analyze.stock_basic_info" \
+    #               "(id INT NOT NULL AUTO_INCREMENT," \
+    #               "code VARCHAR(255) NULL," \
+    #               "name VARCHAR(255) NULL," \
+    #               "market VARCHAR(255) NULL," \
+    #               "csv VARCHAR(255) NULL," \
+    #               "PRIMARY KEY (id))"
+    # try:
+    #     n = MysqlCursor.execute(sql_0)
+    #     MysqlConn.commit()
+    # except Exception, e:
+    #     print e
 
     setNum = 0
     for stock in stockList:
@@ -89,49 +89,49 @@ def setStockBasicData(MysqlCursor , MysqlConn, stockList):
             print e
             continue
 
-        if stock[2] != None:
-            print '---create a new table for it---'
-            sql_1 = "CREATE TABLE stock_analyze.stock_quotations_" + str(stock[0]) + \
-                  "(id INT NOT NULL AUTO_INCREMENT," \
-                  "today_open VARCHAR(255) NULL," \
-                  "yesterday_open VARCHAR(255) NULL," \
-                  "now_price VARCHAR(255) NULL," \
-                  "today_high VARCHAR(255) NULL," \
-                  "today_low VARCHAR(255) NULL," \
-                  "buy_1 VARCHAR(255) NULL," \
-                  "sale_1 VARCHAR(255) NULL," \
-                  "volume VARCHAR(255) NULL," \
-                  "volume_price VARCHAR(255) NULL," \
-                  "buy_1_hand VARCHAR(255) NULL," \
-                  "buy_1_price VARCHAR(255) NULL," \
-                  "buy_2_hand VARCHAR(255) NULL," \
-                  "buy_2_price VARCHAR(255) NULL," \
-                  "buy_3_hand VARCHAR(255) NULL," \
-                  "buy_3_price VARCHAR(255) NULL," \
-                  "buy_4_hand VARCHAR(255) NULL," \
-                  "buy_4_price VARCHAR(255) NULL," \
-                  "buy_5_hand VARCHAR(255) NULL," \
-                  "buy_5_price VARCHAR(255) NULL," \
-                  "sale_1_hand VARCHAR(255) NULL," \
-                  "sale_1_price VARCHAR(255) NULL," \
-                  "sale_2_hand VARCHAR(255) NULL," \
-                  "sale_2_price VARCHAR(255) NULL," \
-                  "sale_3_hand VARCHAR(255) NULL," \
-                  "sale_3_price VARCHAR(255) NULL," \
-                  "sale_4_hand VARCHAR(255) NULL," \
-                  "sale_4_price VARCHAR(255) NULL," \
-                  "sale_5_hand VARCHAR(255) NULL," \
-                  "sale_5_price VARCHAR(255) NULL," \
-                  "date VARCHAR(255) NULL," \
-                  "time VARCHAR(255) NULL," \
-                  "PRIMARY KEY (id))"
-            try:
-                n = MysqlCursor.execute(sql_1)
-                if n != 0:
-                    setNum = setNum + 1
-            except Exception, e:
-                print e
-                continue
+        # if stock[2] != None:
+        #     print '---create a new table for it---'
+        #     sql_1 = "CREATE TABLE stock_analyze.stock_quotations_" + str(stock[0]) + \
+        #           "(id INT NOT NULL AUTO_INCREMENT," \
+        #           "today_open VARCHAR(255) NULL," \
+        #           "yesterday_open VARCHAR(255) NULL," \
+        #           "now_price VARCHAR(255) NULL," \
+        #           "today_high VARCHAR(255) NULL," \
+        #           "today_low VARCHAR(255) NULL," \
+        #           "buy_1 VARCHAR(255) NULL," \
+        #           "sale_1 VARCHAR(255) NULL," \
+        #           "volume VARCHAR(255) NULL," \
+        #           "volume_price VARCHAR(255) NULL," \
+        #           "buy_1_hand VARCHAR(255) NULL," \
+        #           "buy_1_price VARCHAR(255) NULL," \
+        #           "buy_2_hand VARCHAR(255) NULL," \
+        #           "buy_2_price VARCHAR(255) NULL," \
+        #           "buy_3_hand VARCHAR(255) NULL," \
+        #           "buy_3_price VARCHAR(255) NULL," \
+        #           "buy_4_hand VARCHAR(255) NULL," \
+        #           "buy_4_price VARCHAR(255) NULL," \
+        #           "buy_5_hand VARCHAR(255) NULL," \
+        #           "buy_5_price VARCHAR(255) NULL," \
+        #           "sale_1_hand VARCHAR(255) NULL," \
+        #           "sale_1_price VARCHAR(255) NULL," \
+        #           "sale_2_hand VARCHAR(255) NULL," \
+        #           "sale_2_price VARCHAR(255) NULL," \
+        #           "sale_3_hand VARCHAR(255) NULL," \
+        #           "sale_3_price VARCHAR(255) NULL," \
+        #           "sale_4_hand VARCHAR(255) NULL," \
+        #           "sale_4_price VARCHAR(255) NULL," \
+        #           "sale_5_hand VARCHAR(255) NULL," \
+        #           "sale_5_price VARCHAR(255) NULL," \
+        #           "date VARCHAR(255) NULL," \
+        #           "time VARCHAR(255) NULL," \
+        #           "PRIMARY KEY (id))"
+        #     try:
+        #         n = MysqlCursor.execute(sql_1)
+        #         if n != 0:
+        #             setNum = setNum + 1
+        #     except Exception, e:
+        #         print e
+        #         continue
     try:
         MysqlConn.commit()
     except Exception, e:
